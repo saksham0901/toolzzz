@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Attendance Calculator | Attendance Tracker Online</title>
+    <meta name="description" content="Track and calculate your subject-wise attendance easily online. Add subjects, months, mark attendance, and stay on top of your academic performance.">
+    <meta name="keywords" content="attendance calculator, student attendance, online attendance tracker, class attendance, subject attendance, attendance percentage">
+    <link rel="canonical" href="https://yourdomain.com/attendance-calculator" />
+
+    <style>
+        /* Reset & base */
+        *, *::before, *::after { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f8f9fa; color: #222; }
+
+        header {
+            background: #124559;
+            color: #fff;
+            text-align: center;
+            padding: 1.5rem 1rem 1rem 1rem;
+            position: relative;
+        }
+        header h1 {
+            font-size: 2rem;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        header p {
+            margin: 0.5rem 0 0 0;
+        }
+
+        /* Ad placeholder styling */
+        .ad-slot {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #e1e6ea;
+            min-height: 90px;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            color: #49515a;
+            font-size: 1.1rem;
+            border: 1px dashed #bbc;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px #00000010;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        @media (max-width:900px) {
+            .container { flex-direction: column; }
+        }
+        main {
+            flex: 5 1 450px;
+            min-width: 0;
+        }
+        aside {
+            flex: 2 1 250px;
+            min-width: 200px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.7rem;
+            color: #124559;
+        }
+        .attendance-form {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fafcff;
+            margin-bottom: 1rem;
+        }
+        thead {
+            background: #eff1f3;
+        }
+        th, td {
+            padding: 0.6em 0.5em;
+            text-align: center;
+        }
+        th { font-weight: 600; }
+        tr:nth-child(odd) td {
+            background: #f7fafd;
+        }
+        input[type="number"] {
+            width: 70px;
+            padding: 0.2em;
+            border: 1px solid #b7c0c3;
+            border-radius: 3px;
+            font-size: 1rem;
+        }
+
+        .subject-controls,
+        .month-controls {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .subject-controls input,
+        .month-controls input {
+            width: 150px;
+            padding: 0.4em 0.6em;
+        }
+        button, input[type="submit"] {
+            background: #15616d;
+            color: #fff;
+            border: none;
+            padding: 0.45em 1em;
+            border-radius: 4px;
+            margin: 0.2rem 0;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover,
+        input[type="submit"]:hover {
+            background: #124559;
+        }
+        .delete-btn {
+            background: #f55c47;
+        }
+        .delete-btn:hover {
+            background: #d92a23;
+        }
+        .attendance-summary {
+            background: #eafbf7;
+            border-left: 6px solid #12af6d;
+            padding: 1em 1.4em;
+            border-radius: 8px;
+            color: #14433b;
+            margin-bottom: 1.7em;
+        }
+
+        @media (max-width:600px) {
+            .container, main, aside { box-shadow: none!important; border-radius: 0!important;padding:0.2rem;}
+            table { font-size: .94rem;}
+        }
+    </style>
+    <!-- Google AdSense script -->
+    <!--
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    -->
+</head>
+<body>
+    <header>
+        <h1>Student Attendance Calculator</h1>
+        <p>Easily track attendance, calculate subject-wise percentages, and stay on top of your academic journey! 📚</p>
+        <!-- AdSense Header Ad Slot -->
+        <div class="ad-slot" id="ad-header-slot">
+            <!-- Insert Google AdSense code here (Ad Unit ID: [YOUR-HEADER-AD-UNIT-ID]) -->
+        </div>
+    </header>
+
+    <div class="container">
+        <main>
+            <section aria-label="Attendance Input">
+                <div class="section-title">Add Subjects</div>
+                <div class="subject-controls">
+                    <input type="text" id="newSubject" placeholder="Subject name" maxlength="30"/>
+                    <button onclick="addSubject()">Add</button>
+                </div>
+                <div class="section-title">Add Months</div>
+                <div class="month-controls">
+                    <input type="text" id="newMonth" placeholder="e.g. June 2024" maxlength="18"/>
+                    <button onclick="addMonth()">Add</button>
+                </div>
+
+                <form class="attendance-form" id="attendanceForm" autocomplete="off">
+                    <table id="attendanceTable">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <!-- Dynamic months will be inserted here -->
+                                <th>Total Attendance Percentage</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dynamic subject rows will be inserted here -->
+                        </tbody>
+                    </table>
+                </form>
+                <div class="attendance-summary" id="attendanceSummary" style="display:none"></div>
+            </section>
+        </main>
+
+        <aside aria-label="Advertisements">
+            <div class="section-title">Sponsored</div>
+            <!-- AdSense Sidebar/Main Ad Slot -->
+            <div class="ad-slot" id="ad-sidebar-slot">
+                <!-- Insert Google AdSense code here (Ad Unit ID: [YOUR-SIDEBAR-AD-UNIT-ID]) -->
+            </div>
+            <div style="font-size: 0.93em; color:#667">
+                <p>Supporting education—earnings from <b>ads</b> help us keep this tool free for everyone.</p>
+            </div>
+        </aside>
+    </div>
+
+    <footer style="text-align:center; color:#889; font-size:.96em; margin:1.8em 0 0 0;">&copy; 2024 Student Attendance Calculator | Made with ❤️ for your success.</footer>
+
+    <script>
+    // Data Structures
+    let subjects = ['Mathematics','Physics'];
+    let months = ['June 2024','July 2024'];
+    // attendance[subject][month] = { total: int, present: int }
+    let attendance = {};
+
+    function initAttendance() {
+        subjects.forEach(sub => {
+            if (!attendance[sub]) attendance[sub] = {};
+            months.forEach(mo => {
+                if (!attendance[sub][mo]) attendance[sub][mo] = { total: "", present: "" };
+            });
+        });
+    }
+
+    function renderTable() {
+        initAttendance();
+        // Table headers
+        let thMonths = months.map(mo => `<th colspan="2">${mo}</th>`).join('');
+        document.querySelector("#attendanceTable thead tr").innerHTML = `
+            <th>Subject</th>${thMonths}<th>Total Attendance %</th><th>Action</th>`;
+        // Table body
+        let rows="";
+        subjects.forEach((sub, si) => {
+            let tds = "";
+            months.forEach(mo => {
+                const entry = attendance[sub][mo];
+                tds += `
+                <td>
+                    <input type="number" min="0" placeholder="Total"
+                        id="tot_${si}_${mo.replace(/\s/g, '')}"
+                        value="${entry.total}" 
+                        onchange="updateAttendance('${sub}','${mo}',true)" />
+                    <br>
+                    <small>Total</small>
+                </td>
+                <td>
+                    <input type="number" min="0" placeholder="Present" 
+                        id="pres_${si}_${mo.replace(/\s/g, '')}"
+                        value="${entry.present}" 
+                        onchange="updateAttendance('${sub}','${mo}',false)" />
+                    <br>
+                    <small>Present</small>
+                </td>
+                `;
+            });
+            // Calculate percentage
+            let [sumPresent, sumTotal] = [0,0];
+            months.forEach(mo => {
+                const {present, total} = attendance[sub][mo];
+                if (!isNaN(Number(present))) sumPresent += Number(present);
+                if (!isNaN(Number(total))) sumTotal += Number(total);
+            });
+            let percent = sumTotal ? ((sumPresent / sumTotal)*100).toFixed(1) : '-';
+            percent = percent==='-'?'N/A': percent+"%";
+            rows += `<tr>
+                <td><strong>${sub}</strong></td>
+                ${tds}
+                <td><b>${percent}</b></td>
+                <td><button class="delete-btn" onclick="delSubject('${sub}')">Delete</button></td>
+            </tr>`;
+        });
+        document.querySelector("#attendanceTable tbody").innerHTML = rows;
+        renderSummary();
+    }
+
+    function updateAttendance(sub, mo, isTotal) {
+        let idx = subjects.indexOf(sub);
+        let moKey = mo.replace(/\s/g, '');
+        let totVal = Number(document.getElementById(`tot_${idx}_${moKey}`).value) || "";
+        let presVal = Number(document.getElementById(`pres_${idx}_${moKey}`).value) || "";
+        if (isTotal) {
+            attendance[sub][mo].total = totVal;
+        } else {
+            attendance[sub][mo].present = presVal;
+        }
+        renderTable();
+    }
+
+    function addSubject() {
+        const name = document.getElementById("newSubject").value.trim();
+        if(name && !subjects.includes(name)) {
+            subjects.push(name);
+            attendance[name] = {};
+            months.forEach(mo=>{attendance[name][mo]={total:"",present:""}});
+            document.getElementById("newSubject").value="";
+            renderTable();
+        }
+    }
+
+    function addMonth() {
+        let mo = document.getElementById("newMonth").value.trim();
+        if (mo && !months.includes(mo)) {
+            months.push(mo);
+            subjects.forEach(sub=>{
+                attendance[sub][mo] = { total:"", present:""};
+            });
+            document.getElementById("newMonth").value="";
+            renderTable();
+        }
+    }
+    function delSubject(sub) {
+        subjects = subjects.filter(s=>s!==sub);
+        delete attendance[sub];
+        renderTable();
+    }
+
+    // Attendance summary
+    function renderSummary() {
+        // Show table-wide average
+        let totalPresent=0, totalSessions=0;
+        subjects.forEach(sub => {
+            months.forEach(mo=>{
+                let pres = Number(attendance[sub][mo].present);
+                let tot = Number(attendance[sub][mo].total);
+                if (!isNaN(pres)) totalPresent+= pres;
+                if (!isNaN(tot)) totalSessions+= tot;
+            });
+        });
+        let msg="";
+        if (subjects.length && months.length) {
+            let percent = totalSessions ? ((totalPresent/totalSessions)*100).toFixed(1) : 0;
+            msg = `Your <b>overall attendance percentage</b> across all subjects and months is <b>${totalSessions? percent+"%":"N/A"}</b>.`;
+        } else {
+            msg = "Add subjects and months to begin tracking your attendance.";
+        }
+        const box = document.getElementById("attendanceSummary");
+        box.innerHTML=msg;
+        box.style.display="block";
+    }
+
+    // SEO Structured Data JSON-LD
+    (function(){
+        let str = `
+        {
+          "@context":"http://schema.org",
+          "@type": "EducationalOrganization",
+          "name":"Student Attendance Calculator Online",
+          "url":"https://yourdomain.com/attendance-calculator",
+          "description":"Track and calculate subject-wise and overall school attendance percentage online for each subject and month."
+        }
+        `;
+        let script=document.createElement('script');
+        script.type='application/ld+json';
+        script.textContent=str;
+        document.head.appendChild(script);
+    })();
+
+    // On load
+    window.onload = function() {renderTable();};
+    </script>
+</body>
+</html>
